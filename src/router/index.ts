@@ -10,6 +10,6 @@ const handleRouter = new Hono();
 
 handleRouter.post('/create', createHandle)
 handleRouter.post('/read', readHandle)
-handleRouter.delete('/delete', deleteHandle)
+handleRouter.delete('/delete/:id', deleteHandle)
 handleRouter.put('/update/:id', updateHandle)
 export default handleRouter;
