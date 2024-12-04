@@ -9,7 +9,7 @@ export const createHandle = async (c: any) => {
         if (!body?.task) {
             return c.json({ error: 'Task null' }, 400);
         }
-        await add(newID++, body.task);
+        await add(body.task);
         return c.json({ success: 'Task added' }, 200);
     } catch (error) {
         console.error('Error adding task:', error);
