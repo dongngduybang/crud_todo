@@ -6,9 +6,18 @@ export const redis = new Redis({
     port: 6379,
 });
 
-export const add = async (id: number, task: string) => {
+export const add = async (task: string) => {
+
+    const lastID = await redis.lindex('todos', -1);
+    let newID = 0;
+    if (lastID) {
+
+        // Parse task cuối cùng để lấy ID
+        const lastTaskObj = JSON.parse(lastID);
+        newID = lastTaskObj.id + 1;
+    }
     const newTask = {
-        id: id,
+        id: newID,
         task: task,
     }
 
@@ -20,10 +29,22 @@ export const read = async () => {
 };
 export const destroy = async (id: number) => {
     const list = await redis.lrange('todos', 0, -1);
-    const destroyTask = await redis.lindex('todos', id);
-    if (destroyTask) {
-        await redis.lrem('todos', 1, destroyTask);
+    const deleteTask = list.find((item) => {
+        const parsedID = JSON.parse(item);
+        return parsedID.id === id;
+    });
+    // const deleteTaskAll = list.filter((item) => {
+    //     const parsedID = JSON.parse(item);
+    //     return parsedID.id === id;
+    // });
+
+    if (!deleteTask) {
+        throw new Error(`ID not found.`);
     }
+    await redis.lrem('todos', 1, deleteTask);
+    // for (const task of deleteTask) {
+    //     await redis.lrem('todos', 0, task);
+    // }
 }
 export const update = async (index: number, task: string, id: number) => {
     const list = await redis.lrange('todos', 0, -1);
